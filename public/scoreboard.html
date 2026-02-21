@@ -3,15 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CTF Platform - Scoreboard</title>
+    <title>Scoreboard</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin:0; padding:0; box-sizing:border-box; }
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Segoe UI', sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             padding: 40px 20px;
@@ -25,10 +21,10 @@
             margin: 0 auto;
         }
         h1 {
-            color: #333;
             text-align: center;
             margin-bottom: 30px;
             font-size: 2.5em;
+            color: #333;
         }
         h1 span {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -38,40 +34,21 @@
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 20px;
         }
         th {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             padding: 15px;
-            font-weight: 600;
         }
         td {
             padding: 15px;
             text-align: center;
             border-bottom: 1px solid #e0e0e0;
         }
-        tr:nth-child(even) {
-            background: #f8f9fa;
-        }
-        tr:hover {
-            background: #f0f0f0;
-        }
-        .rank-1 {
-            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
-            color: #333;
-            font-weight: bold;
-        }
-        .rank-2 {
-            background: linear-gradient(135deg, #c0c0c0 0%, #e0e0e0 100%);
-            color: #333;
-            font-weight: bold;
-        }
-        .rank-3 {
-            background: linear-gradient(135deg, #cd7f32 0%, #e6b17e 100%);
-            color: white;
-            font-weight: bold;
-        }
+        tr:nth-child(even) { background: #f8f9fa; }
+        .rank-1 { background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%); font-weight: bold; }
+        .rank-2 { background: linear-gradient(135deg, #c0c0c0 0%, #e0e0e0 100%); font-weight: bold; }
+        .rank-3 { background: linear-gradient(135deg, #cd7f32 0%, #e6b17e 100%); color: white; font-weight: bold; }
         .nav-links {
             text-align: center;
             margin-top: 30px;
@@ -79,30 +56,7 @@
         .nav-links a {
             color: #667eea;
             text-decoration: none;
-            font-weight: 500;
             margin: 0 10px;
-        }
-        .nav-links a:hover {
-            text-decoration: underline;
-        }
-        .loading {
-            text-align: center;
-            padding: 40px;
-            color: #666;
-        }
-        .error-message {
-            color: #dc3545;
-            text-align: center;
-            padding: 20px;
-            background: #f8d7da;
-            border-radius: 10px;
-            margin: 20px 0;
-        }
-        .last-update {
-            text-align: right;
-            color: #666;
-            font-size: 0.8em;
-            margin-top: 10px;
         }
     </style>
 </head>
@@ -111,84 +65,61 @@
         <h1>🏆 <span>Scoreboard</span></h1>
         
         <div id="scoreboard">
-            <div class="loading">Chargement du classement...</div>
+            <div style="text-align:center; padding:40px;">Chargement...</div>
         </div>
         
-        <div id="lastUpdate" class="last-update"></div>
-        
         <div class="nav-links">
-            <a href="/">⬅️ Retour aux challenges</a>
+            <a href="/">⬅️ Accueil</a>
             <a href="/ifno">👨‍💼 Admin</a>
         </div>
     </div>
 
-    <script>
-        async function loadScoreboard() {
-            const scoreboardDiv = document.getElementById('scoreboard');
-            
-            try {
-                const response = await fetch('/api/scoreboard');
-                const participants = await response.json();
-                
-                if (!response.ok) {
-                    throw new Error('Erreur chargement');
-                }
-                
-                if (!participants || participants.length === 0) {
-                    scoreboardDiv.innerHTML = '<p style="text-align: center; padding: 40px;">📭 Aucun participant pour le moment</p>';
-                    return;
-                }
-                
-                let tableHTML = `
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Rang</th>
-                                <th>Participant</th>
-                                <th>Points</th>
-                                <th>Challenges</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                `;
-                
-                participants.forEach((p, i) => {
-                    let rankClass = '';
-                    if (i === 0) rankClass = 'rank-1';
-                    else if (i === 1) rankClass = 'rank-2';
-                    else if (i === 2) rankClass = 'rank-3';
-                    
-                    tableHTML += `
-                        <tr>
-                            <td class="${rankClass}">#${i + 1}</td>
-                            <td><strong>${p.name || 'Anonyme'}</strong></td>
-                            <td>${p.points || 0} pts</td>
-                            <td>${p.solved?.length || 0}</td>
-                        </tr>
-                    `;
-                });
-                
-                tableHTML += '</tbody></table>';
-                scoreboardDiv.innerHTML = tableHTML;
-                
-                document.getElementById('lastUpdate').innerHTML = 
-                    `Dernière mise à jour: ${new Date().toLocaleTimeString()}`;
-                
-            } catch (error) {
-                scoreboardDiv.innerHTML = `
-                    <div class="error-message">
-                        ❌ Erreur chargement<br>
-                        <small>Rafraîchissez la page</small>
-                    </div>
-                `;
-            }
-        }
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+        import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
-        // Chargement immédiat
-        loadScoreboard();
+        const firebaseConfig = {
+            apiKey: "AIzaSyATwlZjZPQCMbunPjG6dM2P3L0H5JVajqA",
+            authDomain: "itetude-ce41d.firebaseapp.com",
+            projectId: "itetude-ce41d",
+            storageBucket: "itetude-ce41d.firebasestorage.app",
+            messagingSenderId: "690766932831",
+            appId: "1:690766932831:web:258086381298771e9924ea"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        async function loadScoreboard() {
+            const snapshot = await getDocs(collection(db, 'participants'));
+            const participants = [];
+            
+            snapshot.forEach(doc => participants.push(doc.data()));
+            participants.sort((a,b) => (b.points || 0) - (a.points || 0));
+            
+            const div = document.getElementById('scoreboard');
+            
+            if (participants.length === 0) {
+                div.innerHTML = '<p style="text-align:center; padding:40px;">Aucun participant</p>';
+                return;
+            }
+            
+            let html = '<table><tr><th>Rang</th><th>Joueur</th><th>Points</th><th>Résolus</th></tr>';
+            participants.forEach((p, i) => {
+                let rankClass = i === 0 ? 'rank-1' : i === 1 ? 'rank-2' : i === 2 ? 'rank-3' : '';
+                html += `<tr>
+                    <td class="${rankClass}">#${i+1}</td>
+                    <td><strong>${p.name}</strong></td>
+                    <td>${p.points || 0} pts</td>
+                    <td>${p.solved?.length || 0}</td>
+                </tr>`;
+            });
+            html += '</table>';
+            div.innerHTML = html;
+        }
         
-        // Rafraîchissement auto toutes les 30s
-        setInterval(loadScoreboard, 30000);
+        loadScoreboard();
+        setInterval(loadScoreboard, 10000);
     </script>
 </body>
 </html>
