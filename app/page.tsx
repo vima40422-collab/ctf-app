@@ -29,6 +29,13 @@ export default function Home() {
     loadChallenges();
   }, []);
 
+  // Lancer confetti quand messageType passe à success
+  useEffect(() => {
+    if (messageType === 'success') {
+      startConfetti();
+    }
+  }, [messageType]);
+
   const loadChallenges = async () => {
     try {
       const snapshot = await getDocs(collection(db, 'challenges'));
@@ -39,6 +46,58 @@ export default function Home() {
     } catch (error) {
       console.error('Erreur chargement challenges:', error);
     }
+  };
+
+  // Confetti simple sans dépendances
+  const startConfetti = () => {
+    const duration = 3000;
+    const end = Date.now() + duration;
+
+    const colors = ['#7c3aed', '#ec4899', '#06b6d4', '#f97316', '#facc15'];
+
+    const canvas = document.createElement('canvas');
+    canvas.id = 'confetti-canvas';
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    document.body.appendChild(canvas);
+
+    const particles: any[] = [];
+    for (let i = 0; i < 120; i++) {
+      particles.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * -canvas.height,
+        vx: (Math.random() - 0.5) * 8,
+        vy: Math.random() * 6 + 2,
+        size: Math.random() * 8 + 4,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        tilt: Math.random() * 0.5,
+      });
+    }
+
+    const step = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      particles.forEach(p => {
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vy += 0.12; // gravity
+        p.tilt += 0.02;
+        ctx.save();
+        ctx.fillStyle = p.color;
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p.tilt);
+        ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size * 0.6);
+        ctx.restore();
+      });
+      if (Date.now() < end) {
+        requestAnimationFrame(step);
+      } else {
+        // fin
+        canvas.remove();
+      }
+    };
+    requestAnimationFrame(step);
   };
 
   const hashFlag = async (flag: string) => {
@@ -117,8 +176,9 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen flex justify-center items-center p-5 py-20">
-      <div className="bg-white rounded-3xl p-12 shadow-2xl w-full max-w-3xl">
+    <div className="min-h-screen relative flex justify-center items-center p-5 py-20">
+      <div className="cyber-bg" aria-hidden="true"></div>
+      <div className="bg-white/5 backdrop-blur-md rounded-3xl p-12 shadow-2xl w-full max-w-3xl relative z-10">
         <h1 className="text-center mb-10 text-5xl font-bold text-gray-900">
           CTF <span className="bg-gradient-to-r from-purple-500 to-pink-600 bg-clip-text text-transparent">Platform</span>
         </h1>
@@ -172,14 +232,14 @@ export default function Home() {
             </select>
           </div>
 
-          <div>
-            <label className="block mb-3 text-gray-700 font-bold text-lg">Flag</label>
+          <div className="flag-panel p-4 rounded-xl">
+            <label className="block mb-3 text-gray-100 font-bold text-lg">Flag</label>
             <input
               type="text"
               value={flag}
               onChange={(e) => setFlag(e.target.value)}
               placeholder="CTF{...}"
-              className="w-full px-5 py-4 text-lg border-2 border-gray-200 rounded-xl focus:outline-none focus:border-purple-500"
+              className="w-full px-5 py-4 text-lg border-0 rounded-xl focus:outline-none bg-white/5 placeholder:text-gray-300 text-white"
             />
           </div>
 
