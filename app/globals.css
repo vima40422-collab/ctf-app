@@ -44,8 +44,9 @@ body {
 
 /* Submission flag panel distinct style */
 .flag-panel {
-  background: linear-gradient(90deg, rgba(99,102,241,0.08), rgba(236,72,153,0.06));
-  border: 1px solid rgba(255,255,255,0.04);
+  background: #f0f9ff; /* light blue like scoreboard */
+  border-left: 6px solid #3b82f6;
+  color: #0f172a;
 }
 
 /* Confetti canvas full screen */

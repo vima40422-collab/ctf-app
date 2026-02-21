@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { db } from '@/lib/firebase';
 import { collection, getDocs, doc, setDoc, getDoc, updateDoc } from 'firebase/firestore';
 
@@ -23,6 +24,7 @@ export default function Home() {
   const [message, setMessage] = useState('');
   const [messageType, setMessageType] = useState<'success' | 'error' | ''>('');
   const [loading, setLoading] = useState(false);
+  const router = useRouter();
 
   // Charger les challenges au démarrage
   useEffect(() => {
@@ -163,10 +165,11 @@ export default function Home() {
       setSelectedChallenge('');
       setSelectedChallengeObj(null);
 
-      // Réinitialiser le message après 3 secondes
+      // show confetti then redirect to scoreboard so ranking updates
       setTimeout(() => {
         setMessage('');
-      }, 3000);
+        router.push('/scoreboard');
+      }, 1200);
     } catch (error) {
       console.error('Erreur:', error);
       setMessageType('error');
