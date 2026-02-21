@@ -89,36 +89,36 @@ export default function Admin() {
 
   if (!user) {
     return (
-      <div className="min-h-screen flex justify-center items-center p-5">
-        <div className="bg-white rounded-2xl p-10 shadow-2xl w-full max-w-md">
-          <h1 className="text-center mb-8 text-4xl font-bold text-gray-900">
+      <div className="min-h-screen flex justify-center items-center p-5 py-20">
+        <div className="bg-white rounded-3xl p-12 shadow-2xl w-full max-w-2xl">
+          <h1 className="text-center mb-10 text-5xl font-bold text-gray-900">
             Admin <span className="bg-gradient-to-r from-purple-500 to-pink-600 bg-clip-text text-transparent">Panel</span>
           </h1>
 
-          <form onSubmit={handleLogin} className="space-y-4">
+          <form onSubmit={handleLogin} className="space-y-6">
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-purple-500"
+              className="w-full px-5 py-4 text-lg border-2 border-gray-200 rounded-xl focus:outline-none focus:border-purple-500"
               placeholder="Email"
             />
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-purple-500"
+              className="w-full px-5 py-4 text-lg border-2 border-gray-200 rounded-xl focus:outline-none focus:border-purple-500"
               placeholder="Mot de passe"
             />
             <button
               type="submit"
-              className="w-full bg-gradient-to-r from-purple-500 to-pink-600 text-white font-bold py-3 rounded-xl hover:opacity-90 transition"
+              className="w-full bg-gradient-to-r from-purple-500 to-pink-600 text-white font-bold py-4 text-lg rounded-xl hover:opacity-90 transition"
             >
               Connexion
             </button>
           </form>
 
-          <Link href="/" className="block text-center mt-4 text-purple-600 hover:text-purple-700">
+          <Link href="/" className="block text-center mt-6 text-purple-600 hover:text-purple-700 font-bold text-lg">
             ← Retour
           </Link>
         </div>
@@ -127,29 +127,29 @@ export default function Admin() {
   }
 
   return (
-    <div className="min-h-screen p-5">
-      <div className="bg-white rounded-2xl p-10 shadow-2xl max-w-4xl mx-auto">
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-4xl font-bold text-gray-900">
+    <div className="min-h-screen p-5 py-10">
+      <div className="bg-white rounded-3xl p-12 shadow-2xl max-w-5xl mx-auto">
+        <div className="flex justify-between items-center mb-12">
+          <h1 className="text-5xl font-bold text-gray-900">
             Admin <span className="bg-gradient-to-r from-purple-500 to-pink-600 bg-clip-text text-transparent">Panel</span>
           </h1>
           <button
             onClick={handleLogout}
-            className="px-6 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition font-semibold"
+            className="px-8 py-3 bg-red-500 text-white rounded-xl hover:bg-red-600 transition font-bold text-lg"
           >
             Déconnexion
           </button>
         </div>
 
-        <div className="mb-8 p-6 bg-gray-50 rounded-xl">
-          <h2 className="text-2xl font-bold mb-4 text-gray-900">Nouveau Challenge</h2>
-          <form onSubmit={handleCreateChallenge} className="space-y-4">
+        <div className="mb-10 p-8 bg-gray-50 rounded-2xl border-2 border-gray-200">
+          <h2 className="text-3xl font-bold mb-6 text-gray-900">➕ Nouveau Challenge</h2>
+          <form onSubmit={handleCreateChallenge} className="space-y-5">
             <input
               type="text"
               value={challengeName}
               onChange={(e) => setChallengeName(e.target.value)}
               placeholder="Nom du challenge"
-              className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-purple-500"
+              className="w-full px-5 py-4 text-lg border-2 border-gray-200 rounded-xl focus:outline-none focus:border-purple-500"
               required
             />
             <input
@@ -157,7 +157,7 @@ export default function Admin() {
               value={challengeFlag}
               onChange={(e) => setChallengeFlag(e.target.value)}
               placeholder="Flag"
-              className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-purple-500"
+              className="w-full px-5 py-4 text-lg border-2 border-gray-200 rounded-xl focus:outline-none focus:border-purple-500"
               required
             />
             <input
@@ -165,45 +165,54 @@ export default function Admin() {
               value={challengePoints}
               onChange={(e) => setChallengePoints(e.target.value)}
               placeholder="Points"
-              className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-purple-500"
+              className="w-full px-5 py-4 text-lg border-2 border-gray-200 rounded-xl focus:outline-none focus:border-purple-500"
             />
             <button
               type="submit"
-              className="w-full bg-gradient-to-r from-purple-500 to-pink-600 text-white font-bold py-3 rounded-xl hover:opacity-90 transition"
+              className="w-full bg-gradient-to-r from-purple-500 to-pink-600 text-white font-bold py-4 text-lg rounded-xl hover:opacity-90 transition"
             >
-              Créer Challenge
+              ✅ Créer Challenge
             </button>
           </form>
         </div>
 
         <div>
-          <h2 className="text-2xl font-bold mb-4 text-gray-900">Challenges</h2>
-          <div className="space-y-3">
-            {challenges.map((challenge) => (
-              <div key={challenge.id} className="bg-gray-50 p-4 rounded-xl flex justify-between items-center">
-                <span className="font-semibold">
-                  {challenge.name} - {challenge.points}pts {challenge.active ? '✅' : '❌'}
-                </span>
-                <div className="space-x-2">
-                  <button
-                    onClick={() => toggleChallenge(challenge.id, challenge.active)}
-                    className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition"
-                  >
-                    Toggle
-                  </button>
-                  <button
-                    onClick={() => deleteChallenge(challenge.id)}
-                    className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition"
-                  >
-                    🗑️
-                  </button>
+          <h2 className="text-3xl font-bold mb-6 text-gray-900">📋 Challenges</h2>
+          {challenges.length === 0 ? (
+            <div className="text-center py-8 text-gray-500 text-xl">
+              Aucun challenge pour le moment...
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {challenges.map((challenge) => (
+                <div key={challenge.id} className="bg-gray-50 p-6 rounded-2xl border-2 border-gray-200 flex justify-between items-center hover:border-purple-300 transition">
+                  <div>
+                    <span className="font-bold text-gray-900 text-lg">
+                      {challenge.name} - {challenge.points}pts
+                    </span>
+                    <span className="ml-4 text-lg">{challenge.active ? '✅' : '❌'}</span>
+                  </div>
+                  <div className="space-x-3">
+                    <button
+                      onClick={() => toggleChallenge(challenge.id, challenge.active)}
+                      className="px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition font-bold text-lg"
+                    >
+                      Toggle
+                    </button>
+                    <button
+                      onClick={() => deleteChallenge(challenge.id)}
+                      className="px-6 py-3 bg-red-500 text-white rounded-lg hover:bg-red-600 transition font-bold text-lg"
+                    >
+                      🗑️ Supprimer
+                    </button>
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
 
-        <Link href="/" className="block text-center mt-8 text-purple-600 hover:text-purple-700 font-semibold">
+        <Link href="/" className="block text-center mt-10 text-purple-600 hover:text-purple-700 font-bold text-lg">
           ← Retour
         </Link>
       </div>
