@@ -93,10 +93,10 @@ export default function Scoreboard() {
                   {users.map((user, index) => (
                     <div key={user.id} className="bg-gradient-to-r from-purple-50 to-pink-50 p-6 rounded-2xl border-2 border-purple-100 hover:border-purple-300 transition">
                       <div className="flex justify-between items-center">
-                        <span className="font-bold text-gray-900 text-lg">
-                          {index === 0 && '🥇'} {index === 1 && '🥈'} {index === 2 && '🥉'} {index > 2 && '🔹'}
-                          {' '}{user.name}
-                        </span>
+                          <div className="flex items-center">
+                            <span className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-purple-500 text-white font-bold mr-4 text-lg">{index + 1}</span>
+                            <span className="font-bold text-gray-900 text-lg">{user.name}</span>
+                          </div>
                         <span className="bg-gradient-to-r from-purple-500 to-pink-600 text-white px-6 py-2 rounded-full font-bold text-lg">
                           {user.score || 0} pts
                         </span>
