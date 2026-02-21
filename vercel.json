@@ -1,9 +1,3 @@
 {
-  "version": 2,
-  "routes": [
-    { "src": "/ifno/?", "dest": "/ifno/index.html" },
-    { "src": "/scoreboard/?", "dest": "/scoreboard.html" },
-    { "src": "/index.html", "dest": "/index.html" },
-    { "src": "/(.*)", "dest": "/$1" }
-  ]
+  "version": 2
 }
