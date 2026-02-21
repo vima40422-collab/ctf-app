@@ -121,11 +121,6 @@
             text-decoration: none;
             font-weight: 500;
         }
-        .loading {
-            text-align: center;
-            padding: 40px;
-            color: #666;
-        }
     </style>
 </head>
 <body>
@@ -134,12 +129,12 @@
         
         <div class="form-group">
             <label>👤 Ton pseudo</label>
-            <input type="text" id="playerName" placeholder="Entre ton pseudo" value="">
+            <input type="text" id="playerName" placeholder="Entre ton pseudo">
         </div>
         
         <h2>Sélectionne un challenge</h2>
         <div id="challengesGrid" class="challenges-grid">
-            <div class="loading">Chargement des challenges...</div>
+            <div style="text-align:center; grid-column:1/-1;">Chargement...</div>
         </div>
         
         <div class="form-group">
@@ -147,7 +142,7 @@
             <input type="text" id="flag" placeholder="flag{...}" disabled>
         </div>
         
-        <button id="submitBtn" onclick="submitFlag()" disabled>Soumettre le flag</button>
+        <button id="submitBtn" onclick="submitFlag()" disabled>Soumettre</button>
         
         <div id="message" class="message"></div>
         
@@ -160,7 +155,6 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
         import { getFirestore, collection, getDocs, doc, getDoc, setDoc, updateDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
-        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyATwlZjZPQCMbunPjG6dM2P3L0H5JVajqA",
@@ -171,187 +165,115 @@
             appId: "1:690766932831:web:258086381298771e9924ea"
         };
 
-        // Initialize Firebase
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
-        const auth = getAuth(app);
         
-        // State
         let challenges = [];
         let selectedChallenge = null;
         
-        // Connect anonymously
-        try {
-            await signInAnonymously(auth);
-            console.log("✅ Connected anonymously");
-        } catch (error) {
-            console.error("❌ Auth error:", error);
-            document.getElementById('challengesGrid').innerHTML = 
-                '<p style="color:red; text-align:center;">Erreur de connexion à Firebase</p>';
-        }
-        
         // Load saved name
-        const savedName = localStorage.getItem('ctf_player');
+        const savedName = localStorage.getItem('player');
         if (savedName) document.getElementById('playerName').value = savedName;
         
-        // Save name on input
         document.getElementById('playerName').addEventListener('input', (e) => {
-            localStorage.setItem('ctf_player', e.target.value);
+            localStorage.setItem('player', e.target.value);
             updateSubmitButton();
         });
 
-        // Load challenges from Firestore
         async function loadChallenges() {
-            try {
-                const snapshot = await getDocs(collection(db, "challenges"));
-                challenges = [];
-                
-                snapshot.forEach(doc => {
-                    const data = doc.data();
-                    if (data.active) {
-                        challenges.push({ id: doc.id, ...data });
-                    }
-                });
-                
-                const grid = document.getElementById('challengesGrid');
-                
-                if (challenges.length === 0) {
-                    grid.innerHTML = '<p style="grid-column:1/-1; text-align:center;">Aucun challenge disponible</p>';
-                    return;
+            const snapshot = await getDocs(collection(db, "challenges"));
+            challenges = [];
+            snapshot.forEach(doc => {
+                if (doc.data().active) {
+                    challenges.push({ id: doc.id, ...doc.data() });
                 }
-                
-                grid.innerHTML = challenges.map(c => `
-                    <div class="challenge-card" onclick="window.selectChallenge('${c.id}')">
-                        <div class="challenge-name">${c.name}</div>
-                        <div class="challenge-points">${c.points} pts</div>
-                    </div>
-                `).join('');
-                
-            } catch (error) {
-                console.error("Error loading challenges:", error);
-                document.getElementById('challengesGrid').innerHTML = 
-                    '<p style="color:red; text-align:center;">Erreur de chargement</p>';
+            });
+            
+            const grid = document.getElementById('challengesGrid');
+            if (challenges.length === 0) {
+                grid.innerHTML = '<p style="grid-column:1/-1; text-align:center;">Aucun challenge</p>';
+                return;
             }
+            
+            grid.innerHTML = challenges.map(c => `
+                <div class="challenge-card" onclick="selectChallenge('${c.id}')">
+                    <div class="challenge-name">${c.name}</div>
+                    <div class="challenge-points">${c.points} pts</div>
+                </div>
+            `).join('');
         }
         
-        // Select challenge
         window.selectChallenge = (id) => {
             selectedChallenge = challenges.find(c => c.id === id);
-            
-            // Update UI
             document.querySelectorAll('.challenge-card').forEach(c => c.classList.remove('selected'));
             event.currentTarget.classList.add('selected');
-            
-            // Enable flag input
             document.getElementById('flag').disabled = false;
             document.getElementById('flag').focus();
-            
             updateSubmitButton();
         };
         
-        // Update submit button state
         function updateSubmitButton() {
             const btn = document.getElementById('submitBtn');
-            btn.disabled = !(document.getElementById('playerName').value && 
-                            selectedChallenge && 
-                            document.getElementById('flag').value);
+            btn.disabled = !(document.getElementById('playerName').value && selectedChallenge && document.getElementById('flag').value);
         }
         
         document.getElementById('flag').addEventListener('input', updateSubmitButton);
         
-        // Hash flag function
         async function hashFlag(flag) {
-            const encoder = new TextEncoder();
-            const data = encoder.encode(flag);
-            const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-            const hashArray = Array.from(new Uint8Array(hashBuffer));
-            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+            const hash = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(flag));
+            return Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2,'0')).join('');
         }
         
-        // Submit flag
         window.submitFlag = async () => {
             const playerName = document.getElementById('playerName').value.trim();
             const flag = document.getElementById('flag').value.trim();
             
-            if (!playerName || !selectedChallenge || !flag) {
-                showMessage('Tous les champs sont requis', 'error');
+            if (!playerName || !selectedChallenge || !flag) return;
+            
+            const hash = await hashFlag(flag);
+            
+            if (hash !== selectedChallenge.flagHash) {
+                showMessage('❌ Flag incorrect', 'error');
                 return;
             }
             
-            // Disable button during submission
-            const submitBtn = document.getElementById('submitBtn');
-            submitBtn.disabled = true;
-            submitBtn.textContent = 'Soumission...';
+            const playerRef = doc(db, 'participants', playerName);
+            const playerDoc = await getDoc(playerRef);
             
-            try {
-                const hash = await hashFlag(flag);
-                
-                if (hash !== selectedChallenge.flagHash) {
-                    showMessage('❌ Flag incorrect', 'error');
-                    submitBtn.disabled = false;
-                    submitBtn.textContent = 'Soumettre le flag';
+            if (playerDoc.exists()) {
+                const data = playerDoc.data();
+                if (data.solved?.includes(selectedChallenge.id)) {
+                    showMessage('⚠️ Déjà résolu', 'error');
                     return;
                 }
-                
-                const playerRef = doc(db, 'participants', playerName);
-                const playerDoc = await getDoc(playerRef);
-                
-                if (playerDoc.exists()) {
-                    const data = playerDoc.data();
-                    if (data.solved && data.solved.includes(selectedChallenge.id)) {
-                        showMessage('⚠️ Déjà résolu', 'error');
-                        submitBtn.disabled = false;
-                        submitBtn.textContent = 'Soumettre le flag';
-                        return;
-                    }
-                    
-                    await updateDoc(playerRef, {
-                        points: (data.points || 0) + selectedChallenge.points,
-                        solved: arrayUnion(selectedChallenge.id)
-                    });
-                } else {
-                    await setDoc(playerRef, {
-                        name: playerName,
-                        points: selectedChallenge.points,
-                        solved: [selectedChallenge.id]
-                    });
-                }
-                
-                showMessage(`✅ +${selectedChallenge.points} points !`, 'success');
-                
-                // Reset
-                document.getElementById('flag').value = '';
-                document.querySelectorAll('.challenge-card').forEach(c => c.classList.remove('selected'));
-                selectedChallenge = null;
-                
-            } catch (error) {
-                console.error("Submit error:", error);
-                showMessage('Erreur lors de la soumission', 'error');
+                await updateDoc(playerRef, {
+                    points: (data.points || 0) + selectedChallenge.points,
+                    solved: arrayUnion(selectedChallenge.id)
+                });
+            } else {
+                await setDoc(playerRef, {
+                    name: playerName,
+                    points: selectedChallenge.points,
+                    solved: [selectedChallenge.id]
+                });
             }
             
-            // Re-enable button
-            submitBtn.disabled = false;
-            submitBtn.textContent = 'Soumettre le flag';
+            showMessage(`✅ +${selectedChallenge.points} points !`, 'success');
+            document.getElementById('flag').value = '';
+            document.querySelectorAll('.challenge-card').forEach(c => c.classList.remove('selected'));
+            selectedChallenge = null;
             updateSubmitButton();
         };
         
-        // Show message function
         function showMessage(text, type) {
             const msg = document.getElementById('message');
             msg.className = `message ${type}`;
             msg.textContent = text;
             msg.style.display = 'block';
-            
-            setTimeout(() => {
-                msg.style.display = 'none';
-            }, 3000);
+            setTimeout(() => msg.style.display = 'none', 3000);
         }
         
-        // Start
         loadChallenges();
-        
-        // Refresh every 30 seconds
-        setInterval(loadChallenges, 30000);
     </script>
 </body>
 </html>

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CTF - Admin</title>
+    <title>Admin</title>
     <style>
         * { margin:0; padding:0; box-sizing:border-box; }
         body {
@@ -32,39 +32,20 @@
             -webkit-text-fill-color: transparent;
         }
         .form-group { margin-bottom: 20px; }
-        label {
-            display: block;
-            margin-bottom: 5px;
-            color: #555;
-            font-weight: 500;
-        }
         input {
             width: 100%;
             padding: 12px;
             border: 2px solid #e0e0e0;
             border-radius: 10px;
-            font-size: 16px;
         }
-        input:focus { outline: none; border-color: #667eea; }
         button {
             padding: 15px 30px;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             border: none;
             border-radius: 10px;
-            font-size: 16px;
-            font-weight: 600;
             cursor: pointer;
         }
-        button:hover { transform: translateY(-2px); }
-        .message {
-            margin-top: 20px;
-            padding: 15px;
-            border-radius: 10px;
-            display: none;
-        }
-        .message.success { background: #d4edda; color: #155724; display: block; }
-        .message.error { background: #f8d7da; color: #721c24; display: block; }
         .challenge-item {
             background: #f8f9fa;
             padding: 15px;
@@ -72,8 +53,6 @@
             border-radius: 10px;
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            border-left: 4px solid #667eea;
         }
         .login-form { display: block; }
         .login-form.hidden { display: none; }
@@ -86,45 +65,19 @@
         <h1>Admin <span>Panel</span></h1>
         
         <div id="loginForm" class="login-form">
-            <div class="form-group">
-                <label>Email</label>
-                <input type="email" id="email" value="vima40422@gmail.com">
-            </div>
-            <div class="form-group">
-                <label>Mot de passe</label>
-                <input type="password" id="password">
-            </div>
+            <input type="email" id="email" value="vima40422@gmail.com" placeholder="Email"><br>
+            <input type="password" id="password" placeholder="Mot de passe"><br>
             <button onclick="login()">Connexion</button>
-            <div id="loginMessage" class="message"></div>
         </div>
         
         <div id="adminContent" class="admin-content">
-            <div style="text-align:right; margin-bottom:20px;">
-                <button onclick="logout()">Déconnexion</button>
-            </div>
-            
+            <button onclick="logout()" style="float:right">Déconnexion</button>
             <h2>Nouveau challenge</h2>
-            
-            <div class="form-group">
-                <label>Nom</label>
-                <input type="text" id="challengeName">
-            </div>
-            <div class="form-group">
-                <label>Flag</label>
-                <input type="text" id="challengeFlag">
-            </div>
-            <div class="form-group">
-                <label>Points</label>
-                <input type="number" id="challengePoints" value="10">
-            </div>
-            <div class="form-group">
-                <label><input type="checkbox" id="challengeActive" checked> Actif</label>
-            </div>
-            
+            <input type="text" id="challengeName" placeholder="Nom"><br>
+            <input type="text" id="challengeFlag" placeholder="Flag"><br>
+            <input type="number" id="challengePoints" value="10"><br>
+            <label><input type="checkbox" id="challengeActive" checked> Actif</label><br>
             <button onclick="createChallenge()">Créer</button>
-            <div id="message" class="message"></div>
-            
-            <h3 style="margin-top:40px;">Challenges</h3>
             <div id="challenges"></div>
         </div>
     </div>
@@ -158,18 +111,11 @@
             }
         });
 
-        window.login = async () => {
-            try {
-                await signInWithEmailAndPassword(
-                    auth,
-                    document.getElementById('email').value,
-                    document.getElementById('password').value
-                );
-            } catch (error) {
-                const msg = document.getElementById('loginMessage');
-                msg.className = 'message error';
-                msg.textContent = 'Erreur: ' + error.message;
-            }
+        window.login = () => {
+            signInWithEmailAndPassword(auth, 
+                document.getElementById('email').value,
+                document.getElementById('password').value
+            );
         };
 
         window.logout = () => signOut(auth);
@@ -180,29 +126,13 @@
         }
 
         window.createChallenge = async () => {
-            const name = document.getElementById('challengeName').value;
-            const flag = document.getElementById('challengeFlag').value;
-            
-            if (!name || !flag) {
-                showMessage('Champs requis', 'error');
-                return;
-            }
-            
-            try {
-                await addDoc(collection(db, 'challenges'), {
-                    name,
-                    flagHash: await hashFlag(flag),
-                    points: parseInt(document.getElementById('challengePoints').value),
-                    active: document.getElementById('challengeActive').checked
-                });
-                
-                showMessage('Challenge créé !', 'success');
-                document.getElementById('challengeName').value = '';
-                document.getElementById('challengeFlag').value = '';
-                loadChallenges();
-            } catch (error) {
-                showMessage('Erreur: ' + error.message, 'error');
-            }
+            await addDoc(collection(db, 'challenges'), {
+                name: document.getElementById('challengeName').value,
+                flagHash: await hashFlag(document.getElementById('challengeFlag').value),
+                points: parseInt(document.getElementById('challengePoints').value),
+                active: document.getElementById('challengeActive').checked
+            });
+            loadChallenges();
         };
 
         window.toggleChallenge = async (id, active) => {
@@ -219,39 +149,18 @@
 
         async function loadChallenges() {
             const snapshot = await getDocs(collection(db, 'challenges'));
-            const div = document.getElementById('challenges');
-            
-            if (snapshot.empty) {
-                div.innerHTML = '<p>Aucun challenge</p>';
-                return;
-            }
-            
-            let html = '';
+            let html = '<h3>Challenges</h3>';
             snapshot.forEach(doc => {
                 const c = doc.data();
-                html += `
-                    <div class="challenge-item">
-                        <div>
-                            <strong>${c.name}</strong> - ${c.points}pts<br>
-                            <small>${c.active ? '✅' : '❌'}</small>
-                        </div>
-                        <div>
-                            <button onclick="toggleChallenge('${doc.id}', ${c.active})">
-                                ${c.active ? 'Désactiver' : 'Activer'}
-                            </button>
-                            <button onclick="deleteChallenge('${doc.id}')">🗑️</button>
-                        </div>
-                    </div>
-                `;
+                html += `<div class="challenge-item">
+                    <span>${c.name} - ${c.points}pts ${c.active ? '✅' : '❌'}</span>
+                    <span>
+                        <button onclick="toggleChallenge('${doc.id}', ${c.active})">Toggle</button>
+                        <button onclick="deleteChallenge('${doc.id}')">🗑️</button>
+                    </span>
+                </div>`;
             });
-            div.innerHTML = html;
-        }
-
-        function showMessage(text, type) {
-            const msg = document.getElementById('message');
-            msg.className = `message ${type}`;
-            msg.textContent = text;
-            setTimeout(() => msg.style.display = 'none', 3000);
+            document.getElementById('challenges').innerHTML = html;
         }
     </script>
 </body>
