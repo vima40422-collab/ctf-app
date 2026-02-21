@@ -3,17 +3,140 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CTF Platform - Admin Panel</title>
+    <title>CTF Platform - Admin</title>
     <style>
-        /* ... gardez votre CSS existant ... */
-        .debug-info {
-            background: #f0f0f0;
-            padding: 10px;
-            border-radius: 5px;
-            font-family: monospace;
-            font-size: 12px;
-            margin: 10px 0;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+        }
+        h1 span {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+            font-weight: 500;
+        }
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+        }
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        button {
+            padding: 15px 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+        button:hover {
+            transform: translateY(-2px);
+        }
+        button.secondary {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+        .message {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 10px;
             display: none;
+        }
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            display: block;
+        }
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            display: block;
+        }
+        .challenges-list {
+            margin-top: 40px;
+            padding: 20px;
+            background: #f5f5f5;
+            border-radius: 10px;
+        }
+        .challenge-item {
+            background: white;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-left: 4px solid #667eea;
+        }
+        .challenge-item.inactive {
+            border-left-color: #dc3545;
+            opacity: 0.7;
+        }
+        .login-form {
+            display: none;
+        }
+        .login-form.active {
+            display: block;
+        }
+        .admin-content {
+            display: none;
+        }
+        .admin-content.active {
+            display: block;
+        }
+        .user-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 10px;
+            background: #f0f0f0;
+            border-radius: 10px;
+        }
+        .nav-links {
+            text-align: center;
+            margin-top: 30px;
+        }
+        .nav-links a {
+            color: #667eea;
+            text-decoration: none;
+            margin: 0 10px;
         }
     </style>
 </head>
@@ -21,47 +144,41 @@
     <div class="container">
         <h1>Admin <span>Panel</span></h1>
         
-        <!-- Debug info (caché par défaut) -->
-        <div id="debugInfo" class="debug-info"></div>
-        
-        <!-- Login Form -->
+        <!-- Login -->
         <div id="loginForm" class="login-form active">
             <div class="form-group">
-                <label for="email">Email</label>
-                <input type="email" id="email" placeholder="admin@example.com" value="vima40422@gmail.com">
+                <label>Email</label>
+                <input type="email" id="email" value="vima40422@gmail.com">
             </div>
             <div class="form-group">
-                <label for="password">Mot de passe</label>
-                <input type="password" id="password" placeholder="••••••••">
+                <label>Mot de passe</label>
+                <input type="password" id="password">
             </div>
-            <button onclick="login()">Se connecter</button>
+            <button onclick="login()">Connexion</button>
             <div id="loginMessage" class="message"></div>
         </div>
         
         <!-- Admin Content -->
         <div id="adminContent" class="admin-content">
             <div class="user-info">
-                <span class="user-email" id="userEmail"></span>
-                <button class="secondary" onclick="logout()" style="padding: 8px 15px;">Déconnexion</button>
+                <span id="userEmail"></span>
+                <button class="secondary" onclick="logout()">Déconnexion</button>
             </div>
             
-            <h2>Créer un challenge</h2>
+            <h2>Nouveau challenge</h2>
             
             <div class="form-group">
-                <label for="challengeName">Nom du challenge</label>
-                <input type="text" id="challengeName" placeholder="Ex: Web1">
+                <label>Nom</label>
+                <input type="text" id="challengeName">
             </div>
-            
             <div class="form-group">
-                <label for="challengeFlag">Flag</label>
-                <input type="text" id="challengeFlag" placeholder="flag{...}">
+                <label>Flag</label>
+                <input type="text" id="challengeFlag">
             </div>
-            
             <div class="form-group">
-                <label for="challengePoints">Points</label>
-                <input type="number" id="challengePoints" value="10" min="1">
+                <label>Points</label>
+                <input type="number" id="challengePoints" value="10">
             </div>
-            
             <div class="form-group">
                 <label>
                     <input type="checkbox" id="challengeActive" checked>
@@ -69,198 +186,92 @@
                 </label>
             </div>
             
-            <button onclick="createChallenge()">Créer le challenge</button>
+            <button onclick="createChallenge()">Créer</button>
             
             <div id="message" class="message"></div>
             
             <div class="challenges-list">
-                <h3>Challenges existants</h3>
+                <h3>Challenges</h3>
                 <div id="challenges"></div>
             </div>
         </div>
         
         <div class="nav-links">
-            <a href="/">⬅️ Retour aux challenges</a>
-            <a href="/scoreboard">🏆 Scoreboard</a>
+            <a href="/">Accueil</a>
+            <a href="/scoreboard">Scoreboard</a>
         </div>
     </div>
 
     <script type="module">
-        // Import Firebase modules
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
-        import { 
-            getAuth, 
-            signInWithEmailAndPassword, 
-            onAuthStateChanged, 
-            signOut 
-        } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
-        import { 
-            getFirestore, 
-            collection, 
-            getDocs, 
-            doc, 
-            deleteDoc, 
-            updateDoc 
-        } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+        import { getFirestore, collection, getDocs, doc, deleteDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
-        // Firebase configuration
         const firebaseConfig = {
             apiKey: "AIzaSyATwlZjZPQCMbunPjG6dM2P3L0H5JVajqA",
             authDomain: "itetude-ce41d.firebaseapp.com",
             projectId: "itetude-ce41d",
             storageBucket: "itetude-ce41d.firebasestorage.app",
             messagingSenderId: "690766932831",
-            appId: "1:690766932831:web:258086381298771e9924ea",
-            measurementId: "G-Q3X9GRNBQE"
+            appId: "1:690766932831:web:258086381298771e9924ea"
         };
 
-        console.log('🔥 Initializing Firebase...');
-        
-        // Initialize Firebase
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // Debug function
-        function addDebug(message) {
-            const debugDiv = document.getElementById('debugInfo');
-            debugDiv.style.display = 'block';
-            debugDiv.innerHTML += `<div>🔍 ${new Date().toLocaleTimeString()}: ${message}</div>`;
-            console.log(message);
-        }
-
-        // Auth state observer
         onAuthStateChanged(auth, async (user) => {
-            addDebug(`Auth state changed: ${user ? 'Connected' : 'Disconnected'}`);
-            
             if (user) {
-                // User is signed in
                 document.getElementById('loginForm').classList.remove('active');
                 document.getElementById('adminContent').classList.add('active');
-                document.getElementById('userEmail').textContent = `Connecté en tant que: ${user.email}`;
+                document.getElementById('userEmail').textContent = user.email;
                 
-                addDebug(`User: ${user.email} (${user.uid})`);
-                
-                // Check if user has admin claims
                 try {
-                    addDebug('Checking admin claims...');
-                    const idTokenResult = await user.getIdTokenResult();
-                    addDebug(`Claims: ${JSON.stringify(idTokenResult.claims)}`);
-                    
-                    if (idTokenResult.claims && idTokenResult.claims.admin === true) {
-                        addDebug('✅ User is admin!');
+                    const token = await user.getIdTokenResult();
+                    if (token.claims.admin) {
                         loadChallenges();
                     } else {
-                        addDebug('❌ User is NOT admin!');
-                        showMessage('Vous n\'avez pas les droits administrateur', 'error');
-                        setTimeout(() => {
-                            logout();
-                        }, 3000);
+                        showMessage('Pas admin', 'error');
+                        setTimeout(logout, 2000);
                     }
-                } catch (error) {
-                    addDebug(`Error checking claims: ${error.message}`);
-                    console.error('Error checking admin claims:', error);
-                    showMessage('Erreur de vérification des droits', 'error');
+                } catch {
+                    loadChallenges();
                 }
             } else {
-                // User is signed out
                 document.getElementById('loginForm').classList.add('active');
                 document.getElementById('adminContent').classList.remove('active');
-                addDebug('User signed out');
             }
         });
 
-        // Login function
-        window.login = async function() {
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            const loginMessage = document.getElementById('loginMessage');
-            
-            addDebug(`Login attempt: ${email}`);
-            
-            if (!email || !password) {
-                loginMessage.className = 'message error';
-                loginMessage.textContent = 'Email et mot de passe requis';
-                return;
-            }
-
+        window.login = async () => {
             try {
-                const userCredential = await signInWithEmailAndPassword(auth, email, password);
-                addDebug(`Login successful: ${userCredential.user.uid}`);
-                loginMessage.className = 'message success';
-                loginMessage.textContent = 'Connexion réussie !';
+                await signInWithEmailAndPassword(
+                    auth, 
+                    document.getElementById('email').value,
+                    document.getElementById('password').value
+                );
             } catch (error) {
-                addDebug(`Login error: ${error.code} - ${error.message}`);
-                loginMessage.className = 'message error';
-                
-                switch (error.code) {
-                    case 'auth/user-not-found':
-                        loginMessage.textContent = 'Utilisateur non trouvé';
-                        break;
-                    case 'auth/wrong-password':
-                        loginMessage.textContent = 'Mot de passe incorrect';
-                        break;
-                    case 'auth/invalid-credential':
-                        loginMessage.textContent = 'Email ou mot de passe incorrect';
-                        break;
-                    case 'auth/too-many-requests':
-                        loginMessage.textContent = 'Trop de tentatives. Réessayez plus tard';
-                        break;
-                    default:
-                        loginMessage.textContent = 'Erreur de connexion: ' + error.message;
-                }
+                document.getElementById('loginMessage').className = 'message error';
+                document.getElementById('loginMessage').textContent = 'Erreur connexion';
             }
         };
 
-        // Logout function
-        window.logout = async function() {
-            addDebug('Logging out...');
-            try {
-                await signOut(auth);
-                addDebug('Logout successful');
-            } catch (error) {
-                addDebug(`Logout error: ${error.message}`);
-                console.error('Logout error:', error);
-            }
-        };
+        window.logout = () => signOut(auth);
 
-        // Hash flag function
         async function hashFlag(flag) {
-            const encoder = new TextEncoder();
-            const data = encoder.encode(flag);
-            const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-            const hashArray = Array.from(new Uint8Array(hashBuffer));
-            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+            const hash = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(flag));
+            return Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2,'0')).join('');
         }
 
-        // Create challenge function
-        window.createChallenge = async function() {
-            const name = document.getElementById('challengeName').value.trim();
-            const flag = document.getElementById('challengeFlag').value.trim();
-            const points = parseInt(document.getElementById('challengePoints').value);
-            const active = document.getElementById('challengeActive').checked;
-
-            addDebug(`Creating challenge: ${name}, ${points}pts`);
-
-            if (!name || !flag || !points) {
-                showMessage('Tous les champs sont requis', 'error');
-                return;
-            }
-
+        window.createChallenge = async () => {
+            const name = document.getElementById('challengeName').value;
+            const flag = document.getElementById('challengeFlag').value;
+            
+            if (!name || !flag) return showMessage('Champs requis', 'error');
+            
             try {
-                const flagHash = await hashFlag(flag);
-                addDebug(`Flag hash: ${flagHash.substring(0, 10)}...`);
-                
-                const user = auth.currentUser;
-                if (!user) {
-                    showMessage('Vous devez être connecté', 'error');
-                    return;
-                }
-                
-                const token = await user.getIdToken();
-                addDebug('Got user token');
-                
-                const response = await fetch('/api/create', {
+                const token = await auth.currentUser.getIdToken();
+                const res = await fetch('/api/create', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -268,135 +279,70 @@
                     },
                     body: JSON.stringify({
                         name,
-                        flagHash,
-                        points,
-                        active
+                        flagHash: await hashFlag(flag),
+                        points: parseInt(document.getElementById('challengePoints').value),
+                        active: document.getElementById('challengeActive').checked
                     })
                 });
-
-                addDebug(`API response status: ${response.status}`);
-                const data = await response.json();
-                addDebug(`API response: ${JSON.stringify(data)}`);
-
-                if (response.ok) {
-                    showMessage('Challenge créé avec succès !', 'success');
+                
+                if (res.ok) {
+                    showMessage('Challenge créé', 'success');
                     document.getElementById('challengeName').value = '';
                     document.getElementById('challengeFlag').value = '';
-                    document.getElementById('challengePoints').value = '10';
-                    document.getElementById('challengeActive').checked = true;
                     loadChallenges();
-                } else {
-                    showMessage(data.error || 'Erreur lors de la création', 'error');
                 }
             } catch (error) {
-                addDebug(`Create challenge error: ${error.message}`);
-                console.error('Create challenge error:', error);
-                showMessage('Erreur de connexion: ' + error.message, 'error');
+                showMessage('Erreur', 'error');
             }
         };
 
-        // Toggle challenge active status
-        window.toggleChallenge = async function(challengeId, currentStatus) {
-            addDebug(`Toggling challenge ${challengeId} to ${!currentStatus}`);
-            try {
-                const challengeRef = doc(db, "challenges", challengeId);
-                await updateDoc(challengeRef, {
-                    active: !currentStatus
-                });
-                showMessage('Statut du challenge mis à jour', 'success');
+        window.toggleChallenge = async (id, active) => {
+            await updateDoc(doc(db, 'challenges', id), { active: !active });
+            loadChallenges();
+        };
+
+        window.deleteChallenge = async (id) => {
+            if (confirm('Supprimer ?')) {
+                await deleteDoc(doc(db, 'challenges', id));
                 loadChallenges();
-            } catch (error) {
-                addDebug(`Toggle challenge error: ${error.message}`);
-                console.error('Toggle challenge error:', error);
-                showMessage('Erreur lors de la modification', 'error');
             }
         };
 
-        // Delete challenge
-        window.deleteChallenge = async function(challengeId) {
-            if (!confirm('Êtes-vous sûr de vouloir supprimer ce challenge ?')) {
+        async function loadChallenges() {
+            const snapshot = await getDocs(collection(db, 'challenges'));
+            const div = document.getElementById('challenges');
+            
+            if (snapshot.empty) {
+                div.innerHTML = '<p>Aucun challenge</p>';
                 return;
             }
             
-            addDebug(`Deleting challenge ${challengeId}`);
-            try {
-                await deleteDoc(doc(db, "challenges", challengeId));
-                loadChallenges();
-                showMessage('Challenge supprimé', 'success');
-            } catch (error) {
-                addDebug(`Delete challenge error: ${error.message}`);
-                console.error('Delete challenge error:', error);
-                showMessage('Erreur lors de la suppression', 'error');
-            }
-        };
-
-        // Load challenges
-        async function loadChallenges() {
-            addDebug('Loading challenges...');
-            try {
-                const challengesSnapshot = await getDocs(collection(db, "challenges"));
-                const challengesDiv = document.getElementById('challenges');
-                
-                addDebug(`Found ${challengesSnapshot.size} challenges`);
-                
-                if (challengesSnapshot.empty) {
-                    challengesDiv.innerHTML = '<p style="text-align: center; padding: 20px;">Aucun challenge créé pour le moment</p>';
-                    return;
-                }
-                
-                challengesDiv.innerHTML = '';
-                
-                challengesSnapshot.forEach(doc => {
-                    const challenge = doc.data();
-                    const challengeDiv = document.createElement('div');
-                    challengeDiv.className = `challenge-item ${challenge.active ? '' : 'inactive'}`;
-                    
-                    const flagHashShort = challenge.flagHash ? 
-                        challenge.flagHash.substring(0, 8) + '...' + challenge.flagHash.substring(challenge.flagHash.length - 8) : 
-                        'No hash';
-                    
-                    challengeDiv.innerHTML = `
-                        <div class="challenge-info">
-                            <strong>${challenge.name || 'Sans nom'}</strong><br>
-                            Points: ${challenge.points || 0} | 
-                            Flag hash: ${flagHashShort}<br>
-                            Statut: ${challenge.active ? '✅ Actif' : '❌ Inactif'}
+            div.innerHTML = '';
+            snapshot.forEach(doc => {
+                const c = doc.data();
+                div.innerHTML += `
+                    <div class="challenge-item ${c.active ? '' : 'inactive'}">
+                        <div>
+                            <strong>${c.name}</strong> - ${c.points}pts<br>
+                            <small>${c.active ? '✅ Actif' : '❌ Inactif'}</small>
                         </div>
-                        <div class="challenge-actions">
-                            <button onclick="toggleChallenge('${doc.id}', ${challenge.active})">
-                                ${challenge.active ? 'Désactiver' : 'Activer'}
+                        <div>
+                            <button onclick="toggleChallenge('${doc.id}', ${c.active})">
+                                ${c.active ? 'Désactiver' : 'Activer'}
                             </button>
-                            <button class="secondary" onclick="deleteChallenge('${doc.id}')">Supprimer</button>
+                            <button class="secondary" onclick="deleteChallenge('${doc.id}')">🗑️</button>
                         </div>
-                    `;
-                    
-                    challengesDiv.appendChild(challengeDiv);
-                });
-            } catch (error) {
-                addDebug(`Load challenges error: ${error.message}`);
-                console.error('Load challenges error:', error);
-                document.getElementById('challenges').innerHTML = '<p style="color: red; text-align: center;">Erreur lors du chargement des challenges</p>';
-            }
+                    </div>
+                `;
+            });
         }
 
-        // Show message function
         function showMessage(text, type) {
-            const messageDiv = document.getElementById('message');
-            messageDiv.className = `message ${type}`;
-            messageDiv.textContent = text;
-            messageDiv.style.display = 'block';
-            
-            setTimeout(() => {
-                messageDiv.style.display = 'none';
-            }, 5000);
+            const msg = document.getElementById('message');
+            msg.className = `message ${type}`;
+            msg.textContent = text;
+            setTimeout(() => msg.style.display = 'none', 3000);
         }
-
-        // Auto-load challenges if user is already logged in
-        if (auth.currentUser) {
-            loadChallenges();
-        }
-
-        addDebug('Admin page loaded');
     </script>
 </body>
 </html>
