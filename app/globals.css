@@ -10,7 +10,7 @@
 
 body {
   font-family: 'Segoe UI', sans-serif;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #667eea 0%, #62596b 100%);
   min-height: 100vh;
 }
 
@@ -44,9 +44,9 @@ body {
 
 /* Submission flag panel distinct style */
 .flag-panel {
-  background: #f0f9ff; /* light blue like scoreboard */
+  background: #87b6d6; /* light blue like scoreboard */
   border-left: 6px solid #3b82f6;
-  color: #0f172a;
+  color: #6a7fb1;
 }
 
 /* Confetti canvas full screen */
