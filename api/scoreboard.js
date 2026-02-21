@@ -1,73 +1,60 @@
-// /api/scoreboard.js
+// /api/scoreboard.js - VERSION DE TEST ULTRA-SIMPLE
 import { db } from '../../firebase.js';
 
 export default async function handler(req, res) {
     // Enable CORS
     res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
     
-    // Handle preflight requests
-    if (req.method === 'OPTIONS') {
-        return res.status(200).end();
-    }
+    // Test simple pour voir si l'API répond
+    console.log('✅ API scoreboard appelée');
     
-    // Only allow GET requests
-    if (req.method !== 'GET') {
-        return res.status(405).json({ error: 'Method not allowed' });
-    }
-
     try {
-        console.log('🔍 Fetching scoreboard...');
-        
-        // Vérifier que db est bien initialisé
+        // 1. Vérifier que db existe
         if (!db) {
-            console.error('❌ Firestore non initialisé');
-            return res.status(500).json({ 
-                error: 'Database not initialized',
-                details: 'Firestore connection failed'
-            });
+            console.error('❌ db est undefined');
+            return res.status(500).json({ error: 'Database not initialized' });
         }
 
-        // Get all participants
+        // 2. Essayer de se connecter à Firestore
+        console.log('📦 Tentative de connexion à Firestore...');
+        
+        // 3. Requête simple
         const participantsRef = db.collection('participants');
-        console.log('📦 Collection reference created');
+        const snapshot = await participantsRef.limit(1).get();
         
-        const snapshot = await participantsRef.get();
-        console.log(`📊 Found ${snapshot.size} participants`);
+        console.log(`📊 Collection participants accessible, taille: ${snapshot.size}`);
         
-        if (snapshot.empty) {
-            console.log('📭 No participants found');
-            return res.status(200).json([]);
-        }
+        // 4. Récupérer tous les participants
+        const allParticipants = await participantsRef.get();
+        const participants = [];
         
-        const participants = snapshot.docs.map(doc => {
+        allParticipants.forEach(doc => {
             const data = doc.data();
-            return {
+            participants.push({
                 name: data.name || 'Anonyme',
-                points: typeof data.points === 'number' ? data.points : 0,
-                solved: Array.isArray(data.solved) ? data.solved : []
-            };
+                points: data.points || 0,
+                solved: data.solved || []
+            });
         });
 
-        // Sort by points descending
+        // 5. Trier
         participants.sort((a, b) => b.points - a.points);
 
-        console.log(`✅ Successfully processed ${participants.length} participants`);
+        console.log(`✅ Renvoi de ${participants.length} participants`);
         return res.status(200).json(participants);
 
     } catch (error) {
-        console.error('❌ Error in scoreboard API:', error);
-        console.error('Error name:', error.name);
-        console.error('Error message:', error.message);
-        console.error('Error stack:', error.stack);
+        // Capture détaillée de l'erreur
+        console.error('❌ ERREUR DANS L\'API:');
+        console.error('Nom:', error.name);
+        console.error('Message:', error.message);
+        console.error('Stack:', error.stack);
         
-        // Return detailed error for debugging
         return res.status(500).json({ 
             error: 'Erreur serveur',
-            message: error.message,
             name: error.name,
-            time: new Date().toISOString()
+            message: error.message,
+            stack: error.stack 
         });
     }
 }

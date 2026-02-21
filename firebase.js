@@ -1,45 +1,31 @@
-// /firebase.js
+// /firebase.js - VERSION SIMPLIFIÉE
 import admin from 'firebase-admin';
 
-console.log('🔥 Initializing Firebase Admin...');
-console.log('Environment variables check:');
-console.log('- FIREBASE_PROJECT_ID:', process.env.FIREBASE_PROJECT_ID ? '✅ Present' : '❌ Missing');
-console.log('- FIREBASE_CLIENT_EMAIL:', process.env.FIREBASE_CLIENT_EMAIL ? '✅ Present' : '❌ Missing');
-console.log('- FIREBASE_PRIVATE_KEY:', process.env.FIREBASE_PRIVATE_KEY ? '✅ Present' : '❌ Missing');
+console.log('🔥 Initialisation Firebase Admin...');
+console.log('Variables d\'environnement:');
+console.log('- PROJECT_ID:', process.env.FIREBASE_PROJECT_ID ? '✅' : '❌');
+console.log('- CLIENT_EMAIL:', process.env.FIREBASE_CLIENT_EMAIL ? '✅' : '❌');
+console.log('- PRIVATE_KEY:', process.env.FIREBASE_PRIVATE_KEY ? '✅' : '❌');
 
 if (!admin.apps.length) {
     try {
-        const privateKey = process.env.FIREBASE_PRIVATE_KEY 
-            ? process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n')
-            : undefined;
-
-        console.log('📝 Private key length:', privateKey ? privateKey.length : 0);
-        console.log('📝 Private key starts with:', privateKey ? privateKey.substring(0, 50) + '...' : 'undefined');
-
-        const credential = admin.credential.cert({
-            projectId: process.env.FIREBASE_PROJECT_ID,
-            clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-            privateKey: privateKey,
-        });
-
+        const privateKey = process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n');
+        
         admin.initializeApp({
-            credential: credential,
+            credential: admin.credential.cert({
+                projectId: process.env.FIREBASE_PROJECT_ID,
+                clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+                privateKey: privateKey,
+            }),
         });
         
-        console.log('✅ Firebase Admin initialized successfully');
+        console.log('✅ Firebase Admin initialisé avec succès');
     } catch (error) {
-        console.error('❌ Firebase Admin initialization error:', error);
-        console.error('Error name:', error.name);
-        console.error('Error message:', error.message);
-        console.error('Error stack:', error.stack);
+        console.error('❌ Erreur initialisation Firebase:', error);
     }
-} else {
-    console.log('✅ Firebase Admin already initialized');
 }
 
 const db = admin.firestore();
 const auth = admin.auth();
-
-console.log('📦 Firestore and Auth instances created');
 
 export { db, auth };
