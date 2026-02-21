@@ -1,22 +1,9 @@
 {
   "version": 2,
-  "functions": {
-    "api/*.js": {
-      "maxDuration": 10
-    }
-  },
-  "rewrites": [
-    {
-      "source": "/api/(.*)",
-      "destination": "/api/$1"
-    },
-    {
-      "source": "/scoreboard",
-      "destination": "/scoreboard.html"
-    },
-    {
-      "source": "/ifno",
-      "destination": "/ifno.html"
-    }
+  "routes": [
+    { "src": "/api/(.*)", "dest": "/api/$1" },
+    { "src": "/ifno", "dest": "/ifno/index.html" },
+    { "src": "/scoreboard", "dest": "/public/scoreboard.html" },
+    { "src": "/(.*)", "dest": "/public/$1" }
   ]
 }
