@@ -238,7 +238,7 @@ export default function Home() {
               type="text"
               value={flag}
               onChange={(e) => setFlag(e.target.value)}
-              placeholder="....le flag caché à saisir ici...."
+              placeholder=">....le flag caché à saisir ici...."
               className="w-full px-5 py-4 text-lg border-0 rounded-xl focus:outline-none bg-white/5 placeholder:text-gray-300 text-white"
             />
           </div>
