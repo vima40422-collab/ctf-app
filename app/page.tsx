@@ -180,7 +180,7 @@ export default function Home() {
       <div className="cyber-bg" aria-hidden="true"></div>
       <div className="bg-white/5 backdrop-blur-md rounded-3xl p-12 shadow-2xl w-full max-w-3xl relative z-10">
         <h1 className="text-center mb-10 text-5xl font-bold text-gray-900">
-          CTF <span className="bg-gradient-to-r from-purple-500 to-pink-600 bg-clip-text text-transparent">Platform</span>
+          CTF <span className="bg-gradient-to-r from-purple-500 to-pink-600 bg-clip-text text-transparent">WEEK-END</span>
         </h1>
 
         {message && (
@@ -200,7 +200,7 @@ export default function Home() {
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="Ton nom"
+              placeholder="Votre nom"
               className="w-full px-5 py-4 text-lg border-2 border-gray-200 rounded-xl focus:outline-none focus:border-purple-500"
             />
           </div>
@@ -211,7 +211,7 @@ export default function Home() {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="ton@email.com"
+              placeholder="exemple@gmail.com"
               className="w-full px-5 py-4 text-lg border-2 border-gray-200 rounded-xl focus:outline-none focus:border-purple-500"
             />
           </div>
@@ -238,7 +238,7 @@ export default function Home() {
               type="text"
               value={flag}
               onChange={(e) => setFlag(e.target.value)}
-              placeholder="CTF{...}"
+              placeholder="....le flag caché à saisir ici...."
               className="w-full px-5 py-4 text-lg border-0 rounded-xl focus:outline-none bg-white/5 placeholder:text-gray-300 text-white"
             />
           </div>
@@ -257,7 +257,7 @@ export default function Home() {
             href="/scoreboard"
             className="px-8 py-4 bg-purple-100 text-purple-700 rounded-xl hover:bg-purple-200 transition font-bold text-lg"
           >
-            🏆 Scoreboard
+            🏆 Tableau de classement
           </Link>
           <Link
             href="/ifno"
