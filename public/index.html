@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CTF Platform - Accueil</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            width: 90%;
+            max-width: 800px;
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+        }
+        h1 span {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        h2 {
+            color: #555;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+        }
+        h3 {
+            color: #666;
+            margin-bottom: 15px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+            font-weight: 500;
+        }
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        input:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        button {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.3s, opacity 0.3s;
+        }
+        button:hover {
+            transform: translateY(-2px);
+        }
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .message {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            display: none;
+        }
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+            display: block;
+        }
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+            display: block;
+        }
+        .message.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+            display: block;
+        }
+        .nav-links {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #e0e0e0;
+        }
+        .nav-links a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 5px 10px;
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+        .nav-links a:hover {
+            background: #f0f0f0;
+            text-decoration: none;
+        }
+        .challenges-section {
+            margin-top: 40px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+        .challenges-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .challenge-card {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+        .challenge-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+        }
+        .challenge-card.selected {
+            border-color: #667eea;
+            background: #f0f3ff;
+        }
+        .challenge-name {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        .challenge-points {
+            color: #667eea;
+            font-weight: 500;
+        }
+        .challenge-status {
+            font-size: 0.85em;
+            color: #28a745;
+            margin-top: 5px;
+        }
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 10px;
+            color: white;
+        }
+        .stat-item {
+            text-align: center;
+        }
+        .stat-value {
+            font-size: 2em;
+            font-weight: 700;
+        }
+        .stat-label {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+        .loading::after {
+            content: '...';
+            animation: dots 1.5s steps(4, end) infinite;
+        }
+        @keyframes dots {
+            0%, 20% { content: '.'; }
+            40% { content: '..'; }
+            60%, 100% { content: '...'; }
+        }
+        .solved-badge {
+            display: inline-block;
+            background: #28a745;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            margin-left: 5px;
+        }
+        .participant-name {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #e8f4fd;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .participant-name label {
+            margin-bottom: 0;
+            white-space: nowrap;
+        }
+        .participant-name input {
+            flex: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>CTF <span>Platform</span></h1>
+        
+        <!-- Stats -->
+        <div class="stats">
+            <div class="stat-item">
+                <div class="stat-value" id="totalChallenges">0</div>
+                <div class="stat-label">Challenges</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="totalParticipants">0</div>
+                <div class="stat-label">Participants</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="totalSubmissions">0</div>
+                <div class="stat-label">Flags soumis</div>
+            </div>
+        </div>
+        
+        <!-- Participant Name -->
+        <div class="participant-name">
+            <label for="name">👤 Ton pseudo:</label>
+            <input type="text" id="name" placeholder="Entre ton pseudo (ex: Alice)" required>
+        </div>
+        
+        <!-- Challenge Selection -->
+        <h2>Sélectionne un challenge</h2>
+        <div id="challengesGrid" class="challenges-grid">
+            <div class="loading">Chargement des challenges</div>
+        </div>
+        
+        <!-- Flag Submission -->
+        <div class="form-group" style="margin-top: 30px;">
+            <label for="flag">🔑 Flag</label>
+            <input type="text" id="flag" placeholder="flag{...}" disabled>
+        </div>
+        
+        <button id="submitBtn" onclick="submitFlag()" disabled>Soumettre le flag</button>
+        
+        <div id="message" class="message"></div>
+        
+        <!-- Challenges List (details) -->
+        <div class="challenges-section">
+            <h3>📋 Détails des challenges</h3>
+            <div id="challengesList"></div>
+        </div>
+        
+        <div class="nav-links">
+            <a href="/scoreboard">🏆 Voir le scoreboard</a>
+            <a href="/ifno">👨‍💼 Admin</a>
+        </div>
+    </div>
+
+    <script type="module">
+        // Import Firebase modules
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+        import { 
+            getFirestore, 
+            collection, 
+            getDocs, 
+            query, 
+            where,
+            doc,
+            getDoc
+        } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyATwlZjZPQCMbunPjG6dM2P3L0H5JVajqA",
+            authDomain: "itetude-ce41d.firebaseapp.com",
+            projectId: "itetude-ce41d",
+            storageBucket: "itetude-ce41d.firebasestorage.app",
+            messagingSenderId: "690766932831",
+            appId: "1:690766932831:web:258086381298771e9924ea",
+            measurementId: "G-Q3X9GRNBQE"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // State
+        let challenges = [];
+        let selectedChallenge = null;
+        let participantName = localStorage.getItem('ctf_participant_name') || '';
+
+        // Initialize
+        document.getElementById('name').value = participantName;
+        loadChallenges();
+        loadStats();
+
+        // Event listeners
+        document.getElementById('name').addEventListener('input', (e) => {
+            participantName = e.target.value.trim();
+            localStorage.setItem('ctf_participant_name', participantName);
+            updateSubmitButton();
+        });
+
+        document.getElementById('flag').addEventListener('input', () => {
+            updateSubmitButton();
+        });
+
+        // Load challenges from Firestore
+        async function loadChallenges() {
+            try {
+                const challengesSnapshot = await getDocs(collection(db, "challenges"));
+                challenges = [];
+                
+                challengesSnapshot.forEach(doc => {
+                    const challenge = doc.data();
+                    if (challenge.active) {
+                        challenges.push({
+                            id: doc.id,
+                            ...challenge
+                        });
+                    }
+                });
+
+                // Sort challenges by points
+                challenges.sort((a, b) => a.points - b.points);
+                
+                displayChallenges();
+                updateStats();
+            } catch (error) {
+                console.error('Error loading challenges:', error);
+                showMessage('Erreur lors du chargement des challenges', 'error');
+            }
+        }
+
+        // Display challenges in grid
+        function displayChallenges() {
+            const grid = document.getElementById('challengesGrid');
+            const list = document.getElementById('challengesList');
+            
+            if (challenges.length === 0) {
+                grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; padding: 20px;">Aucun challenge disponible pour le moment</p>';
+                list.innerHTML = '<p style="text-align: center; padding: 20px;">Aucun challenge disponible</p>';
+                return;
+            }
+
+            // Grid view
+            grid.innerHTML = challenges.map(challenge => `
+                <div class="challenge-card ${selectedChallenge?.id === challenge.id ? 'selected' : ''}" 
+                     onclick="selectChallenge('${challenge.id}')">
+                    <div class="challenge-name">${challenge.name}</div>
+                    <div class="challenge-points">${challenge.points} points</div>
+                    <div class="challenge-status">✅ Disponible</div>
+                </div>
+            `).join('');
+
+            // List view (details)
+            list.innerHTML = challenges.map(challenge => `
+                <div class="challenge-item" style="padding: 10px; margin: 5px 0; background: white; border-radius: 5px; border-left: 4px solid #667eea;">
+                    <strong>${challenge.name}</strong> - ${challenge.points} points
+                </div>
+            `).join('');
+        }
+
+        // Select challenge
+        window.selectChallenge = function(challengeId) {
+            selectedChallenge = challenges.find(c => c.id === challengeId);
+            
+            // Update UI
+            document.querySelectorAll('.challenge-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            event.currentTarget.classList.add('selected');
+            
+            // Enable flag input
+            document.getElementById('flag').disabled = false;
+            document.getElementById('flag').focus();
+            
+            updateSubmitButton();
+        };
+
+        // Update submit button state
+        function updateSubmitButton() {
+            const submitBtn = document.getElementById('submitBtn');
+            const flag = document.getElementById('flag').value.trim();
+            
+            if (participantName && selectedChallenge && flag) {
+                submitBtn.disabled = false;
+            } else {
+                submitBtn.disabled = true;
+            }
+        }
+
+        // Submit flag
+        window.submitFlag = async function() {
+            const name = participantName;
+            const challenge = selectedChallenge?.id;
+            const flag = document.getElementById('flag').value.trim();
+
+            if (!name || !challenge || !flag) {
+                showMessage('Tous les champs sont requis', 'error');
+                return;
+            }
+
+            // Disable button during submission
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Soumission en cours...';
+
+            try {
+                const response = await fetch('/api/submit', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ name, challenge, flag })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    showMessage(`✅ Bravo ! +${data.points} points`, 'success');
+                    document.getElementById('flag').value = '';
+                    selectedChallenge = null;
+                    document.querySelectorAll('.challenge-card').forEach(card => {
+                        card.classList.remove('selected');
+                    });
+                    loadStats(); // Refresh stats
+                } else {
+                    showMessage(data.error || 'Erreur lors de la soumission', 'error');
+                }
+            } catch (error) {
+                console.error('Submit error:', error);
+                showMessage('Erreur de connexion au serveur', 'error');
+            } finally {
+                // Re-enable button
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Soumettre le flag';
+                updateSubmitButton();
+            }
+        };
+
+        // Load stats
+        async function loadStats() {
+            try {
+                const participantsSnapshot = await getDocs(collection(db, "participants"));
+                const challengesSnapshot = await getDocs(collection(db, "challenges"));
+                
+                const totalParticipants = participantsSnapshot.size;
+                const totalChallenges = challengesSnapshot.size;
+                
+                // Count total submissions
+                let totalSubmissions = 0;
+                participantsSnapshot.forEach(doc => {
+                    const data = doc.data();
+                    totalSubmissions += data.solved?.length || 0;
+                });
+                
+                document.getElementById('totalParticipants').textContent = totalParticipants;
+                document.getElementById('totalChallenges').textContent = totalChallenges;
+                document.getElementById('totalSubmissions').textContent = totalSubmissions;
+            } catch (error) {
+                console.error('Error loading stats:', error);
+            }
+        }
+
+        // Update stats after submission
+        function updateStats() {
+            // Just reload stats
+            loadStats();
+        }
+
+        // Show message function
+        function showMessage(text, type) {
+            const messageDiv = document.getElementById('message');
+            messageDiv.className = `message ${type}`;
+            messageDiv.textContent = text;
+            messageDiv.style.display = 'block';
+            
+            // Auto-hide after 5 seconds
+            setTimeout(() => {
+                messageDiv.style.display = 'none';
+            }, 5000);
+        }
+
+        // Make functions available globally
+        window.selectChallenge = selectChallenge;
+        window.submitFlag = submitFlag;
+
+        // Load data periodically
+        setInterval(() => {
+            loadChallenges();
+            loadStats();
+        }, 30000); // Refresh every 30 seconds
+    </script>
+</body>
+</html>

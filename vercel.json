@@ -1,0 +1,30 @@
+{
+  "version": 2,
+  "functions": {
+    "api/*.js": {
+      "maxDuration": 10
+    }
+  },
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "/api/$1"
+    },
+    {
+      "src": "/ifno",
+      "dest": "/ifno/index.html"
+    },
+    {
+      "src": "/ifno/(.*)",
+      "dest": "/ifno/$1"
+    },
+    {
+      "src": "/scoreboard",
+      "dest": "/public/scoreboard.html"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/public/$1"
+    }
+  ]
+}
