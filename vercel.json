@@ -1,7 +1,6 @@
 {
   "version": 2,
-  "buildCommand": "npm run build",
-  "outputDirectory": "public",
+  "public": "public",
   "routes": [
     { "src": "/ifno/?", "dest": "/ifno/index.html" },
     { "src": "/scoreboard/?", "dest": "/scoreboard.html" },
