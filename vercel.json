@@ -1,6 +1,5 @@
 {
   "version": 2,
-  "public": "public",
   "routes": [
     { "src": "/ifno/?", "dest": "/ifno/index.html" },
     { "src": "/scoreboard/?", "dest": "/scoreboard.html" },
