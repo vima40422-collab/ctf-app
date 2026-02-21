@@ -92,7 +92,7 @@ export default function Scoreboard() {
                 <div className="space-y-4">
                   {users.map((user, index) => (
                     <div key={user.id} className="bg-gradient-to-r from-purple-50 to-pink-50 p-6 rounded-2xl border-2 border-purple-100 hover:border-purple-300 transition">
-                      <div className="flex justify-between items-center mb-2">
+                      <div className="flex justify-between items-center">
                         <span className="font-bold text-gray-900 text-lg">
                           {index === 0 && '🥇'} {index === 1 && '🥈'} {index === 2 && '🥉'} {index > 2 && '🔹'}
                           {' '}{user.name}
@@ -101,7 +101,6 @@ export default function Scoreboard() {
                           {user.score || 0} pts
                         </span>
                       </div>
-                      <p className="text-gray-600 text-base">{user.email}</p>
                     </div>
                   ))}
                 </div>

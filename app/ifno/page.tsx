@@ -9,7 +9,7 @@ import { collection, addDoc, getDocs, updateDoc, deleteDoc, doc } from 'firebase
 export default function Admin() {
   const [user, setUser] = useState<any>(null);
   const [challenges, setChallenges] = useState<any[]>([]);
-  const [email, setEmail] = useState('vima40422@gmail.com');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [challengeName, setChallengeName] = useState('');
   const [challengeFlag, setChallengeFlag] = useState('');
