@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Panel</title>
+    <title>CTF - Admin</title>
     <style>
         * { margin:0; padding:0; box-sizing:border-box; }
         body {
@@ -55,10 +55,8 @@
             font-size: 16px;
             font-weight: 600;
             cursor: pointer;
-            transition: transform 0.3s;
         }
         button:hover { transform: translateY(-2px); }
-        button.secondary { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
         .message {
             margin-top: 20px;
             padding: 15px;
@@ -77,27 +75,17 @@
             align-items: center;
             border-left: 4px solid #667eea;
         }
-        .challenge-item.inactive { border-left-color: #dc3545; opacity: 0.7; }
-        .login-form { display: none; }
-        .login-form.active { display: block; }
+        .login-form { display: block; }
+        .login-form.hidden { display: none; }
         .admin-content { display: none; }
-        .admin-content.active { display: block; }
-        .user-info {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            padding: 10px;
-            background: #f0f0f0;
-            border-radius: 10px;
-        }
+        .admin-content.visible { display: block; }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Admin <span>Panel</span></h1>
         
-        <div id="loginForm" class="login-form active">
+        <div id="loginForm" class="login-form">
             <div class="form-group">
                 <label>Email</label>
                 <input type="email" id="email" value="vima40422@gmail.com">
@@ -111,9 +99,8 @@
         </div>
         
         <div id="adminContent" class="admin-content">
-            <div class="user-info">
-                <span id="userEmail"></span>
-                <button class="secondary" onclick="logout()">Déconnexion</button>
+            <div style="text-align:right; margin-bottom:20px;">
+                <button onclick="logout()">Déconnexion</button>
             </div>
             
             <h2>Nouveau challenge</h2>
@@ -135,13 +122,10 @@
             </div>
             
             <button onclick="createChallenge()">Créer</button>
-            
             <div id="message" class="message"></div>
             
-            <div style="margin-top:40px;">
-                <h3>Challenges existants</h3>
-                <div id="challenges"></div>
-            </div>
+            <h3 style="margin-top:40px;">Challenges</h3>
+            <div id="challenges"></div>
         </div>
     </div>
 
@@ -165,13 +149,12 @@
 
         onAuthStateChanged(auth, (user) => {
             if (user && user.email === 'vima40422@gmail.com') {
-                document.getElementById('loginForm').classList.remove('active');
-                document.getElementById('adminContent').classList.add('active');
-                document.getElementById('userEmail').textContent = user.email;
+                document.getElementById('loginForm').classList.add('hidden');
+                document.getElementById('adminContent').classList.add('visible');
                 loadChallenges();
             } else {
-                document.getElementById('loginForm').classList.add('active');
-                document.getElementById('adminContent').classList.remove('active');
+                document.getElementById('loginForm').classList.remove('hidden');
+                document.getElementById('adminContent').classList.remove('visible');
             }
         });
 
@@ -182,9 +165,10 @@
                     document.getElementById('email').value,
                     document.getElementById('password').value
                 );
-            } catch {
-                document.getElementById('loginMessage').className = 'message error';
-                document.getElementById('loginMessage').textContent = 'Erreur connexion';
+            } catch (error) {
+                const msg = document.getElementById('loginMessage');
+                msg.className = 'message error';
+                msg.textContent = 'Erreur: ' + error.message;
             }
         };
 
@@ -204,17 +188,21 @@
                 return;
             }
             
-            await addDoc(collection(db, 'challenges'), {
-                name,
-                flagHash: await hashFlag(flag),
-                points: parseInt(document.getElementById('challengePoints').value),
-                active: document.getElementById('challengeActive').checked
-            });
-            
-            showMessage('Challenge créé !', 'success');
-            document.getElementById('challengeName').value = '';
-            document.getElementById('challengeFlag').value = '';
-            loadChallenges();
+            try {
+                await addDoc(collection(db, 'challenges'), {
+                    name,
+                    flagHash: await hashFlag(flag),
+                    points: parseInt(document.getElementById('challengePoints').value),
+                    active: document.getElementById('challengeActive').checked
+                });
+                
+                showMessage('Challenge créé !', 'success');
+                document.getElementById('challengeName').value = '';
+                document.getElementById('challengeFlag').value = '';
+                loadChallenges();
+            } catch (error) {
+                showMessage('Erreur: ' + error.message, 'error');
+            }
         };
 
         window.toggleChallenge = async (id, active) => {
@@ -238,11 +226,11 @@
                 return;
             }
             
-            div.innerHTML = '';
+            let html = '';
             snapshot.forEach(doc => {
                 const c = doc.data();
-                div.innerHTML += `
-                    <div class="challenge-item ${c.active ? '' : 'inactive'}">
+                html += `
+                    <div class="challenge-item">
                         <div>
                             <strong>${c.name}</strong> - ${c.points}pts<br>
                             <small>${c.active ? '✅' : '❌'}</small>
@@ -251,11 +239,12 @@
                             <button onclick="toggleChallenge('${doc.id}', ${c.active})">
                                 ${c.active ? 'Désactiver' : 'Activer'}
                             </button>
-                            <button class="secondary" onclick="deleteChallenge('${doc.id}')">🗑️</button>
+                            <button onclick="deleteChallenge('${doc.id}')">🗑️</button>
                         </div>
                     </div>
                 `;
             });
+            div.innerHTML = html;
         }
 
         function showMessage(text, type) {

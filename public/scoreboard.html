@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Scoreboard</title>
+    <title>CTF - Scoreboard</title>
     <style>
         * { margin:0; padding:0; box-sizing:border-box; }
         body {
@@ -34,6 +34,7 @@
         table {
             width: 100%;
             border-collapse: collapse;
+            margin-top: 20px;
         }
         th {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -46,9 +47,9 @@
             border-bottom: 1px solid #e0e0e0;
         }
         tr:nth-child(even) { background: #f8f9fa; }
-        .rank-1 { background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%); font-weight: bold; }
-        .rank-2 { background: linear-gradient(135deg, #c0c0c0 0%, #e0e0e0 100%); font-weight: bold; }
-        .rank-3 { background: linear-gradient(135deg, #cd7f32 0%, #e6b17e 100%); color: white; font-weight: bold; }
+        .rank-1 { background: #ffd700; font-weight: bold; }
+        .rank-2 { background: #c0c0c0; font-weight: bold; }
+        .rank-3 { background: #cd7f32; color: white; font-weight: bold; }
         .nav-links {
             text-align: center;
             margin-top: 30px;
@@ -58,25 +59,27 @@
             text-decoration: none;
             margin: 0 10px;
         }
+        .error {
+            color: red;
+            text-align: center;
+            padding: 40px;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>🏆 <span>Scoreboard</span></h1>
-        
-        <div id="scoreboard">
-            <div style="text-align:center; padding:40px;">Chargement...</div>
-        </div>
-        
+        <div id="scoreboard">Chargement...</div>
         <div class="nav-links">
-            <a href="/">⬅️ Accueil</a>
-            <a href="/ifno">👨‍💼 Admin</a>
+            <a href="/">Accueil</a>
+            <a href="/ifno">Admin</a>
         </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
         import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyATwlZjZPQCMbunPjG6dM2P3L0H5JVajqA",
@@ -89,33 +92,40 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
+        const auth = getAuth(app);
+        
+        await signInAnonymously(auth);
 
         async function loadScoreboard() {
-            const snapshot = await getDocs(collection(db, 'participants'));
-            const participants = [];
-            
-            snapshot.forEach(doc => participants.push(doc.data()));
-            participants.sort((a,b) => (b.points || 0) - (a.points || 0));
-            
-            const div = document.getElementById('scoreboard');
-            
-            if (participants.length === 0) {
-                div.innerHTML = '<p style="text-align:center; padding:40px;">Aucun participant</p>';
-                return;
+            try {
+                const snapshot = await getDocs(collection(db, 'participants'));
+                const participants = [];
+                snapshot.forEach(doc => participants.push(doc.data()));
+                
+                participants.sort((a,b) => (b.points || 0) - (a.points || 0));
+                
+                let html = '<table><tr><th>Rang</th><th>Joueur</th><th>Points</th><th>Résolus</th></tr>';
+                
+                if (participants.length === 0) {
+                    html = '<p style="text-align:center; padding:40px;">Aucun participant</p>';
+                } else {
+                    participants.forEach((p, i) => {
+                        let rankClass = i === 0 ? 'rank-1' : i === 1 ? 'rank-2' : i === 2 ? 'rank-3' : '';
+                        html += `<tr>
+                            <td class="${rankClass}">#${i+1}</td>
+                            <td><strong>${p.name || '?'}</strong></td>
+                            <td>${p.points || 0}</td>
+                            <td>${p.solved?.length || 0}</td>
+                        </tr>`;
+                    });
+                    html += '</table>';
+                }
+                
+                document.getElementById('scoreboard').innerHTML = html;
+            } catch (error) {
+                document.getElementById('scoreboard').innerHTML = 
+                    '<div class="error">Erreur chargement: ' + error.message + '</div>';
             }
-            
-            let html = '<table><tr><th>Rang</th><th>Joueur</th><th>Points</th><th>Résolus</th></tr>';
-            participants.forEach((p, i) => {
-                let rankClass = i === 0 ? 'rank-1' : i === 1 ? 'rank-2' : i === 2 ? 'rank-3' : '';
-                html += `<tr>
-                    <td class="${rankClass}">#${i+1}</td>
-                    <td><strong>${p.name}</strong></td>
-                    <td>${p.points || 0} pts</td>
-                    <td>${p.solved?.length || 0}</td>
-                </tr>`;
-            });
-            html += '</table>';
-            div.innerHTML = html;
         }
         
         loadScoreboard();
