@@ -1,73 +1,103 @@
-# CTF Platform - Next.js
 
-Une plateforme de Capture The Flag (CTF) moderne construite avec Next.js, Firebase et Tailwind CSS.
+# ctf-app — Plateforme de soumission de Flag CTF (Next.js)
 
-## 🚀 Fonctionnalités
+Une application CTF (Capture The Flag) légère construite avec Next.js, TypeScript, Tailwind CSS et Firebase.
 
-- **Page d'accueil** - Soumettre des flags et participer aux challenges
-- **Panel Admin** (/ifno) - Créer et gérer les challenges
-- **Scoreboard** (/scoreboard) - Voir les classements et challenges actifs
-- **Firebase Integration** - Authentification et base de données temps réel
-- **Responsive Design** - Fonctionne sur tous les appareils
+**Objectif** : fournir une base fonctionnelle pour organiser des challenges, soumettre des flags et afficher un classement.
 
-## 📦 Installation
+## 🚀 Fonctionnalités principales
+
+- Soumission de flags depuis l'interface utilisateur
+- Tableau des scores (`/scoreboard`)
+- Interface d'administration pour gérer les challenges (`/ifno`)
+- Authentification et stockage via Firebase
+- UI responsive avec Tailwind CSS
+
+## 🧰 Stack technique
+
+- Framework : Next.js
+- Langage : TypeScript
+- UI : Tailwind CSS
+- Backend / Auth / DB : Firebase (Firestore + Auth)
+
+## Démarrage rapide
+
+1. Installer les dépendances :
 
 ```bash
 npm install
 ```
 
-## 🔧 Développement
+2. Configurer les variables d'environnement (voir section suivante).
+
+3. Lancer en développement :
 
 ```bash
 npm run dev
 ```
 
-Ouvre [http://localhost:3000](http://localhost:3000) dans ton navigateur.
+L'application sera accessible sur `http://localhost:3000`.
 
-## 🏗️ Build & Déploiement
+Pour construire :
 
 ```bash
 npm run build
 npm start
 ```
 
-Déploiement sur **Vercel**:
-```bash
-git push origin main
-```
+## 🔐 Configuration et variables d'environnement
 
-## 📁 Structure
+Créez un fichier `.env.local` à la racine et ajoutez vos valeurs privées. Exemple de variables utilisées par l'application (noms indicatifs) :
 
 ```
-ctf-app/
-├── app/
-│   ├── page.tsx           # Page d'accueil
-│   ├── layout.tsx         # Layout global
-│   ├── globals.css        # Styles globaux
-│   ├── ifno/
-│   │   └── page.tsx       # Panel Admin
-│   └── scoreboard/
-│       └── page.tsx       # Scoreboard
-├── lib/
-│   └── firebase.ts        # Configuration Firebase
-├── components/            # Composants réutilisables
-└── package.json          # Dépendances
+NEXT_PUBLIC_FIREBASE_API_KEY=your_api_key
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your_auth_domain
+NEXT_PUBLIC_FIREBASE_PROJECT_ID=your_project_id
+NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=your_storage_bucket
+NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
+NEXT_PUBLIC_FIREBASE_APP_ID=your_app_id
+FIREBASE_PRIVATE_KEY=your_private_key_if_needed
 ```
 
-## 🔐 Variables d'Environnement
+Le fichier `lib/firebase.ts` lit ces variables pour initialiser Firebase.
 
-Les clés Firebase sont configurées dans `lib/firebase.ts`.
+## Structure du projet
 
-## 🛠️ Tech Stack
+Arborescence principale :
 
-- **Framework**: Next.js 14
-- **Database**: Firebase Firestore
-- **Auth**: Firebase Authentication
-- **Styling**: Tailwind CSS
-- **Language**: TypeScript
+```
+app/
+	├── page.tsx         # Page d'accueil
+	├── layout.tsx       # Layout global
+	├── globals.css      # Styles globaux
+	├── ifno/            # Interface d'administration
+	└── scoreboard/      # Page du classement
+components/            # Composants réutilisables
+lib/                   # Helpers (ex: `firebase.ts`)
+package.json
+tsconfig.json
+vercel.json
+```
 
-## 📝 Notes
+## Déploiement
 
-- Email admin authentifié: vima40422@gmail.com
-- Les flags sont hasés en SHA-256
-- Animation smooth avec CSS gradients
+Site: https://ctf-app-ten.vercel.app/
+
+## Contribution
+
+Contributions bienvenues : ouvrez une issue pour discuter des changements souhaités puis soumettez une PR.
+
+Checklist minimale pour une PR :
+
+- Description de la fonctionnalité / bugfix
+- Pas de secrets committés
+- Tests ou vérifications manuelles décrites
+
+## Sécurité & confidentialité
+
+- Ne publiez pas vos clés Firebase dans le dépôt.
+
+## Ressources & aide
+
+- Code lié : `lib/firebase.ts`
+- Pages importantes : `app/page.tsx`, `app/ifno/page.tsx`, `app/scoreboard/page.tsx`
